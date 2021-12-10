@@ -13,9 +13,8 @@ Author:
     Harper Stewart
     harperestewart7@gmail.com
 """
-# TODO 2. Create exceptions for if a file doesn't contain "Function::" and print a list
+# TODO Create exceptions for if a file doesn't contain "Function::" and print a list
 # TODO Go through the functions and make sure format matches
-# TODO make a documentation package (not necessary but fun)
 
 def main(path_to_repo = ''):
     df_docu, repo_path = gather_scripts(extensions=('.py', '.R'),
