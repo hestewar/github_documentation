@@ -16,10 +16,42 @@ Author:
 # TODO Create exceptions for if a file doesn't contain "Function::" and print a list
 # TODO Go through the functions and make sure format matches
 
-def main(path_to_repo = ''):
+def main(path_to_repo = '', github_repo_url = ''):
+    """
+    Function::: main
+    	Description: Run functions to create Github documentation
+    	Details:
+
+    Inputs
+        path_to_repo: STR Directory of repository on local computer
+        github_repo_url: STR Github repo URL with Org name
+
+    Outputs
+        output: FILE Creates documentation.md in local repo folder
+
+    Dependencies
+        tkinter
+    """
+    # Dependencies
+    from tkinter.filedialog import askdirectory
+    import tkinter
+
+    # Get required arguments
+    root = tkinter.Tk()
+    root.withdraw()
+    # Select the repository that you are creating documentation for
+    if path_to_repo == '':
+        path_to_repo = askdirectory(title='Select Repository to Update: ')
+    root.destroy()
+
+    # Provide Github Repo URL for repository
+    if github_repo_url == '':
+        print('Provide Github URL of repository as 2nd argument')
+
     df_docu, repo_path = gather_scripts(extensions=('.py', '.R'),
                              df_documentation='',
-                             path=path_to_repo)
+                             path=path_to_repo,
+                             github_repo_url=github_repo_url)
     df_docu = df_docu.reset_index(drop=True)
     df_docu = df_docu.drop_duplicates()
     batch_documentation(df_documentation=df_docu, path =repo_path)
@@ -27,7 +59,8 @@ def main(path_to_repo = ''):
 
 def scrape_documentation(code_script='',
                          df_documentation='',
-                         path=''):
+                         path='',
+                         github_repo_url=''):
     """
     Function::: scrape_documentation
         Description: Scrape a code script for documentation info
@@ -64,7 +97,7 @@ def scrape_documentation(code_script='',
 
 
     # Get the script name
-    split_script = code_script.split('/')
+    split_script = code_script.split('\\')
     script_name = split_script[-1]
 
     # Inititalize the list
@@ -139,8 +172,7 @@ def scrape_documentation(code_script='',
         repo_name = folder_names_string[-2]
 
         # Create the string of the script webiste
-        script_website = 'https://github.com/' + github_org + '/' + repo_name + \
-                         '/' + 'blob/master/' + folder_name + '/' + script_name
+        script_website = github_repo_url + '/blob/master/' + folder_name + '/' + script_name
 
         # Create row for the specific function
         new_row = pd.DataFrame([[script_name,
@@ -165,7 +197,8 @@ def scrape_documentation(code_script='',
 
 def gather_scripts(extensions = ('.py', '.R'),
                    df_documentation='',
-                   path=''):
+                   path='',
+                   github_repo_url=''):
     """
     Function::: gather_scripts
     	Description: List scripts in repository and scrape documentation information.
@@ -184,20 +217,14 @@ def gather_scripts(extensions = ('.py', '.R'),
         os
         tkinter
         pandas
-        glob
     """
     # Dependencies
     import os.path
-    from tkinter.filedialog import askdirectory
     import pandas as pd
     import tkinter
-    import glob
 
     root = tkinter.Tk()
     root.withdraw()
-    # Select the repository that you are creating documentation for
-    if path == '':
-        path = askdirectory(title='Select Repository to Update: ')
     root.destroy()
 
     # Create a list of all the files
@@ -232,7 +259,8 @@ def gather_scripts(extensions = ('.py', '.R'),
         print('Starting on '+str(i)+' of '+str(len(file_list_sm)) + ': '+file_list_sm[i])
         df_documentation = scrape_documentation(code_script=file_list_sm[i],
                                                 df_documentation=df_documentation,
-                                                path=path)
+                                                path=path,
+                                                github_repo_url=github_repo_url)
 
     return df_documentation, path
 
@@ -394,9 +422,9 @@ def batch_documentation(df_documentation='',path = ''):
         table_of_contents uscbrl labcodes
     """
     # Dependencies
-    from documentation.document_fxn import create_documentation
+    from github_documentation.document_fxn import create_documentation
     import os.path
-    from documentation.document_fxn import table_of_contents
+    from github_documentation.document_fxn import table_of_contents
 
     docu_csv = df_documentation
 
