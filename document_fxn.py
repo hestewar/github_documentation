@@ -16,7 +16,9 @@ Author:
 # TODO Create exceptions for if a file doesn't contain "Function::" and print a list
 # TODO Go through the functions and make sure format matches
 
-def main(path_to_repo = '', github_repo_url = ''):
+def main(path_to_repo='',
+         github_repo_url='',
+         extensions=('.py', '.R')):
     """
     Function::: main
     	Description: Run functions to create Github documentation
@@ -25,6 +27,7 @@ def main(path_to_repo = '', github_repo_url = ''):
     Inputs
         path_to_repo: STR Directory of repository on local computer
         github_repo_url: STR Github repo URL with Org name
+        extensions: TUPLE List of file extensions to include (Default: .py, .R)
 
     Outputs
         output: FILE Creates documentation.md in local repo folder
@@ -48,7 +51,7 @@ def main(path_to_repo = '', github_repo_url = ''):
     if github_repo_url == '':
         print('Provide Github URL of repository as 2nd argument')
 
-    df_docu, repo_path = gather_scripts(extensions=('.py', '.R'),
+    df_docu, repo_path = gather_scripts(extensions=extensions,
                              df_documentation='',
                              path=path_to_repo,
                              github_repo_url=github_repo_url)
@@ -195,7 +198,7 @@ def scrape_documentation(code_script='',
     return df_documentation
 
 
-def gather_scripts(extensions = ('.py', '.R'),
+def gather_scripts(extensions=('.py', '.R'),
                    df_documentation='',
                    path='',
                    github_repo_url=''):
@@ -238,7 +241,8 @@ def gather_scripts(extensions = ('.py', '.R'),
     ignore_list = ['.git', 'pycache','.idea', '__init__']
 
     file_list_sm = [s for s in file_list if not any(x in s for x in ignore_list)]
-    file_list_sm = [s for s in file_list_sm if any(x in s for x in extensions)]
+    file_list_sm = [s for s in file_list_sm if any(s.endswith(x) for x in extensions)]
+
 
     print('Files to document: ')
     print(file_list_sm)
@@ -256,9 +260,9 @@ def gather_scripts(extensions = ('.py', '.R'),
 
     # Run the documentation function
     for i in range(len(file_list_sm)):
-        print('Starting on '+str(i)+' of '+str(len(file_list_sm)) + ': '+file_list_sm[i])
+        print('Starting on '+str(i+1)+' of '+str(len(file_list_sm)) + ': '+file_list_sm[i])
         df_documentation = scrape_documentation(code_script=file_list_sm[i],
-                                                df_documentation=df_documentation,
+                                              df_documentation=df_documentation,
                                                 path=path,
                                                 github_repo_url=github_repo_url)
 
