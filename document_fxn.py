@@ -168,15 +168,17 @@ def scrape_documentation(code_script='',
         fxn_depen = fxn_depen.replace("#", "")
         fxn_depen = fxn_depen.replace("    ", "")
 
+        github_url_split = github_repo_url.split('/')
+        repo_name = github_url_split[-1]
         # Find the folder names using the path
-        folder_names_string = path.split('/')
-        folder_name = folder_names_string[-1]
-        github_org = folder_names_string[-3]
-        repo_name = folder_names_string[-2]
+        if code_script.count("\\") == 2:
+            folder_names_string = code_script.split("\\")
+            folder_name = folder_names_string[-2] + '/'
+        else:
+            folder_name = ''
 
         # Create the string of the script webiste
-        script_website = github_repo_url + '/blob/master/' + folder_name + '/' + script_name
-
+        script_website = github_repo_url + '/blob/master/' + folder_name + script_name
         # Create row for the specific function
         new_row = pd.DataFrame([[script_name,
                                  fxn_name,
